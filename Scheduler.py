@@ -35,29 +35,26 @@ class Scheduler(object):
 			else:
 				task = task + str(char)
 
-		print '\nAll {} tasks have been received from client.' .format(len(self.tasks))
+		print '\nAll {} tasks have been received from client.\n' .format(len(self.tasks))
 
 		scheduler_socket.close()
 		return
 
 	def sendResults(self):
-		print 'Sending results back to client...'
-		print self.clientIP, self.port+1
+		print 'Sending results back to client...\n'
 
 		resultSent = list()
 
 		scheduler_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		scheduler_socket.connect((self.clientIP, self.port + 100))
 
-		while 1:
-			if len(self.results) > 0:
-				for item in self.results:
-					print 'Sending result of {} ' .format(item)
-					scheduler_socket.send(item)
-					resultSent.append(item)
-				for item in resultSent:
-					self.results.remove(item)
-				resultSent.clear()
+		for result in self.results:
+			msg = 'Sending result of {}: Done!' .format(result)
+			print 'Sending result of {}' .format(result)
+			scheduler_socket.send('{}\n' .format(msg))
+
+		scheduler_socket.send('Q')
+		print 'All results have been sent to client successfully.\n'
 		return
 	
 	def createLocalWorker(self, nWorkers):

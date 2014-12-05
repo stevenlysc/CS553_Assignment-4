@@ -16,6 +16,6 @@ class LocalWorker(Thread):
 			sleepTime = int(milliSleepTime) / 1000.0
 			time.sleep(sleepTime)
 
-			result = task + 'is done.'
+			result = task + ' is done'
 			self.results.append(result)
 		return
