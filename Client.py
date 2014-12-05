@@ -90,8 +90,9 @@ if __name__ == '__main__':
     
     client = Client(ip, port, workload_file)
     
-    start = time.clock()
+    start = time.time()
     client.send_Tasks()
     client.receive_Result()
-    print 'Elapsed: {} ms' .format(1000 * (time.clock() - start))
+    end = time.time()
+    print 'Elapsed: {} ms' .format(1000 * (end - start))
 
