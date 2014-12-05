@@ -49,8 +49,8 @@ class Scheduler(object):
 		scheduler_socket.connect((self.clientIP, self.port + 100))
 
 		for result in self.results:
-			msg = 'Sending result of {}: Done!' .format(result)
-			print 'Sending result of {}' .format(result)
+			msg = 'Receiving result: {}' .format(result)
+			print 'Sending result: {}' .format(result)
 			scheduler_socket.send('{}\n' .format(msg))
 
 		scheduler_socket.send('Q')
