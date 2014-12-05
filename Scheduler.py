@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import boto
+import boto.sqs
+from boto.sqs.message import Message
 import socket
 import argparse
 from LocalWorker import LocalWorker
@@ -72,6 +73,36 @@ class Scheduler(object):
 			self.results += worker.results
 
 		return
+	
+	# Remote Worker
+	def createSQS(self):
+		sqsConn = boto.sqs.connect_to_region('us-west-2')
+		taskQueue = sqsConn.create_queue('taskQueue')
+		resultQueue = sqsConn.create_queue('resultQueue')
+		print 'SQS Create Successfull.\n'
+		return
+
+	def sendTaskToSQS(self):
+		print 'Sending tasks to SQS...'
+		sqsConn = boto.sqs.connect_to_region('us-west-2')
+		taskQueue = sqsConn.get_queue('taskQueue')
+		for task in self.tasks:
+			print '\tSending {} to SQS' .format(task)
+			msg = Message()
+			msg.set_body(task)
+			taskQueue.write(msg)
+		print 'All tasks have been sent to SQS successfully.\n'
+		return
+
+	def getResultFromSQS(self):
+		print 'Retreiving results from SQS\n'
+		sqsConn = boto.sqs.connect_to_region('us-west-2')
+		resultQueue = sqsConn.get_queue('resultQueue')
+		results = resultQueue.get_messages()
+		for result in results:
+			self.results.append(result.get_body())
+		return
+
 
 
 if __name__ == '__main__':
@@ -95,5 +126,7 @@ if __name__ == '__main__':
 		scheduler.sendResults()
 	
 	if args.remote:
-		pass
-		#scheduler.createRemoteWorker()
+		scheduler.receiveTasks()
+		scheduler.createSQS()
+		scheduler.sendTaskToSQS()
+		scheduler.getResultFromSQS()
