@@ -1,112 +1,87 @@
-import sys
-import getopt
+# -*- coding: utf-8 -*-
+
+import boto
 import socket
-import threadpool
-import time
-import thread
-import boto.sqs
-from boto.sqs.message import Message
-  
-def getArgs():
-    global port,num,tag
-    shortargs="s:"
-    longargs=["port=","lw=","rw"]
-    options,values=getopt.getopt(sys.argv[1:], shortargs, longargs)  
-    for option,value in options:
-        if option=="-s":
-            port=value      
-        if option=="--lw":
-            num=value
-        if option=="--rw":
-            pass
-        if num!=0 and tag==1:
-            print "Wrong parameter!!!"
-            sys.exit(0)
+import argparse
 
-def recvTask():  
-    global schedulerSock,task,lists,test,connection
-    while True:
-        print("I am waiting task from client...")
-        connection,address=schedulerSock.accept()
-        while True:
-            data=connection.recv(1024)
-            if data=="End of task": 
-                break
-            data=data.strip()
-            test.append(data) 
-        print("I receive %d tasks from client!"%len(test))
-        break
-         
-def createWorkers(threadID):
-    global num,test
-    if num!=0 and len(test)!=0:    
-        pool=threadpool.ThreadPool(int(num))
-        requests=threadpool.makeRequests(doTask,test,print_result)
-        [pool.putRequest(req) for req in requests]
-        pool.wait()
-    else:
-        pass
+class Scheduler(object):
+	def __init__(self, port):
+		self.tasks = list()
+		self.results = list()
+		self.port = port
+		self.clientIP = str()
+		return
 
-def doTask(unexecutedTask): 
-    global test
-    try:
-        millisecond=unexecutedTask.split(":")[1].split(" ")[1]
-        second=float(millisecond)/100.0
-        time.sleep(second)
-        test.remove(unexecutedTask)   
-        result=unexecutedTask+"---0"     
-    except ValueError:
-        result=unexecutedTask+"---1"
-    finally:
-        return result
+	def receiveTasks(self):
+		print 'Waiting for the tasks from client...\n'
+		
+		scheduler_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		scheduler_socket.bind(('', self.port))
+		scheduler_socket.listen(5)
 
-def print_result(request,result):
-    global taskResult
-    print "Completed-> %s" % result
-    taskResult.append(result)
+		clientSock, addr = scheduler_socket.accept()
+		self.clientIP = addr[0]
 
-def sendResults(threadID):
-    global taskResult,connection
-    while True:
-        if len(taskResult)>0:
-            for item in taskResult:
-                print "I am sending results %s" % item
-                connection.send(item)
-                taskResult.remove(item)
-                      
-if __name__=="__main__":    
-    ipaddress=""
-    port=""
-    num=0
-    test=[]
-    getArgs()
-    schedulerSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    schedulerSock.bind((ipaddress, int(port)))
-    schedulerSock.listen(1)
-    recvTask()
-    if num!=0:
-        taskResult=[] 
-        createWorkers()
-        sendResult()    		
-    elif num==0:
-        print "I am sending tasks to sqs"
-        conn=boto.sqs.connect_to_region("us-east-1")
-        taskQueue=conn.create_queue('taskQueue')
-        resultQueue=conn.create_queue('resultQueue')
-        m=Message()
-        for item in test:
-            m.set_body(item)
-            taskQueue.write(m)
-        print "All tasks are sent to sqs"
-        while True:
-            if resultQueue.count()>0:                
-                rs=resultQueue.get_messages()
-                if len(rs)>0:
-                    m=rs[0]
-                    body=m.get_body()
-                    print "I am sending results %s" % body
-                    connection.send(body)
-                    resultQueue.delete_message(m)
-                else:
-                    pass
-    
+		task = str()
+		while 1:
+			char = clientSock.recv(1)
+			if char == 'Q':
+				break
+			elif char == '\n':
+				print '{} received.' .format(task)
+				self.tasks.append(task.strip())
+				task = str()
+			else:
+				task = task + str(char)
+
+		print '\nAll {} tasks have been received from client.' .format(len(self.tasks))
+
+		scheduler_socket.close()
+		return
+
+	def sendResults(self):
+		print 'Sending results back to client...'
+		print self.clientIP, self.port+1
+
+		resultSent = list()
+
+		scheduler_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		scheduler_socket.connect((self.clientIP, self.port + 100))
+		scheduler_socket.send('testing')
+
+		while 1:
+			if len(self.results) > 0:
+				for item in self.results:
+					print 'Sending result of {}' .format(item)
+					scheduler_socket.send(item)
+					resultSent.append(item)
+				for item in resultSent:
+					self.results.remove(item)
+				resultSent.clear()
+
+
+
+
+if __name__ == '__main__':
+	
+	# scheduler -p <PORT> --local --remote
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-p', metavar='PORT', type=int, required=True,
+						help='the port used by socket.')
+	group = parser.add_mutually_exclusive_group()
+	group.add_argument('-lw', '--local', help='local worker', action='store_true')
+	group.add_argument('-rw', '--remote', help='remote worker', action='store_true')
+	
+	args = parser.parse_args()
+
+	port = args.p
+
+	scheduler = Scheduler(port)
+	if args.local:
+		scheduler.receiveTasks()
+		scheduler.sendResults()
+		#scheduler.createLocalWorker()
+	
+	if args.remote:
+		pass
+		#scheduler.createRemoteWorker()

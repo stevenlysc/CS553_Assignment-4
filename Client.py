@@ -5,7 +5,7 @@ import socket
 class Client(object):
     def __init__(self, ip, port, workload_file):
         self.ip = ip
-        self.port = port
+        self.port = int(port)
         self.workload_file = workload_file
         return
     
@@ -23,26 +23,31 @@ class Client(object):
         return tasks
     
     def send_Tasks(self):
+        print 'Sending tasks...\n'
         tasks = self.get_Tasks()
+
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect((self.ip, self.port))
 
         for taskId in range(len(tasks)):
             msg = 'Task {}: {}' .format(taskId, tasks[taskId])
-            client_socket.send(msg)
+            client_socket.send('{}\n' .format(msg))
             print '{} is sent to scheduler successfully' .format(msg)
         
-        client_socket.send('End of task')
-        print 'All tasks have been sent to scheduler successfully.'
+        client_socket.send('Q')
+        print '\nAll tasks have been sent to scheduler successfully.\n'
 
         client_socket.close()
         return
     
     def receive_Result(self):
-        print 'Waiting for the results...'
+        print 'Waiting for the results...\n'
+
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.bind(('', self.port))
+        client_socket.bind(('', self.port + 100))
         client_socket.listen(5)
-        conn, addr = self.client_socket.accept()
+
+        conn, addr = client_socket.accept()
         while True:  
             result = conn.recv(2048)
             if result == 'End of result':
@@ -78,9 +83,6 @@ if __name__ == '__main__':
     workload_file = args.w
     
     client = Client(ip, port, workload_file)
-    
-    client.show_Args()
-    client.show_Tasks()
     
     client.send_Tasks()
     client.receive_Result()
