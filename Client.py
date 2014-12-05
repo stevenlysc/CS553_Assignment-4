@@ -48,11 +48,16 @@ class Client(object):
         client_socket.listen(5)
 
         conn, addr = client_socket.accept()
-        while True:  
-            result = conn.recv(2048)
-            if result == 'End of result':
+        result = str()
+        while 1:  
+            char = conn.recv(1)
+            if char == 'Q':
                 break
-            print result
+            elif char == '\n':
+                print result
+                result = str()
+            else:
+                result = result + str(char)
         return
     
     # Test-Oriented Methods

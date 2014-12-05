@@ -3,6 +3,7 @@
 import boto
 import socket
 import argparse
+from LocalWorker import LocalWorker
 
 class Scheduler(object):
 	def __init__(self, port):
@@ -47,19 +48,33 @@ class Scheduler(object):
 
 		scheduler_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		scheduler_socket.connect((self.clientIP, self.port + 100))
-		scheduler_socket.send('testing')
 
 		while 1:
 			if len(self.results) > 0:
 				for item in self.results:
-					print 'Sending result of {}' .format(item)
+					print 'Sending result of {} ' .format(item)
 					scheduler_socket.send(item)
 					resultSent.append(item)
 				for item in resultSent:
 					self.results.remove(item)
 				resultSent.clear()
+		return
+	
+	def createLocalWorker(self, nWorkers):
+		workers = list()
+		
+		for n in range(nWorkers):
+			lw = LocalWorker(self.tasks[(n*len(self.tasks)/nWorkers):((n+1)*len(self.tasks)/nWorkers)])
+			workers.append(lw)
+			lw.start()
 
+		for worker in workers:
+			worker.join()
 
+		for worker in workers:
+			self.results += worker.results
+
+		return
 
 
 if __name__ == '__main__':
@@ -69,8 +84,8 @@ if __name__ == '__main__':
 	parser.add_argument('-p', metavar='PORT', type=int, required=True,
 						help='the port used by socket.')
 	group = parser.add_mutually_exclusive_group()
-	group.add_argument('-lw', '--local', help='local worker', action='store_true')
-	group.add_argument('-rw', '--remote', help='remote worker', action='store_true')
+	group.add_argument('-lw', '--local', type=int, help='local worker')
+	group.add_argument('-rw', '--remote',type=int, help='remote worker')
 	
 	args = parser.parse_args()
 
@@ -79,8 +94,8 @@ if __name__ == '__main__':
 	scheduler = Scheduler(port)
 	if args.local:
 		scheduler.receiveTasks()
+		scheduler.createLocalWorker(args.local)
 		scheduler.sendResults()
-		#scheduler.createLocalWorker()
 	
 	if args.remote:
 		pass
