@@ -7,37 +7,47 @@ import argparse
 class Scheduler(object):
 	def __init__(self, port):
 		self.tasks = list()
-		self.resutls = list()
+		self.results = list()
 		self.port = port
+		self.clientIP = str()
 		return
 
 	def receiveTasks(self):
-		print 'Waiting for the tasks from client...'
+		print 'Waiting for the tasks from client...\n'
 		
 		scheduler_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		scheduler_socket.bind(('', self.port))
 		scheduler_socket.listen(5)
 
 		clientSock, addr = scheduler_socket.accept()
-		print 'Connected by {}' .format(addr)
+		self.clientIP = addr[0]
 
+		task = str()
 		while 1:
-			task = clientSock.recv(2048)
-			if task == 'End of task':
+			char = clientSock.recv(1)
+			if char == 'Q':
 				break
-			print '{} received.' .format(task)
-			self.tasks.append(task.strip())
+			elif char == '\n':
+				print '{} received.' .format(task)
+				self.tasks.append(task.strip())
+				task = str()
+			else:
+				task = task + str(char)
 
-		print 'All {} tasks have been received from client.' .format(len(self.tasks))
+		print '\nAll {} tasks have been received from client.' .format(len(self.tasks))
 
 		scheduler_socket.close()
 		return
 
 	def sendResults(self):
 		print 'Sending results back to client...'
-		
+		print self.clientIP, self.port+1
+
 		resultSent = list()
+
 		scheduler_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		scheduler_socket.connect((self.clientIP, self.port + 100))
+		scheduler_socket.send('testing')
 
 		while 1:
 			if len(self.results) > 0:
