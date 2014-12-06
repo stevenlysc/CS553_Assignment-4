@@ -108,7 +108,7 @@ if __name__ == '__main__':
 						help='the port used by socket.')
 	group = parser.add_mutually_exclusive_group()
 	group.add_argument('-lw', '--local', type=int, help='local worker')
-	group.add_argument('-rw', '--remote',type=int, help='remote worker')
+	group.add_argument('-rw', '--remote', help='remote worker', action='store_true')
 	
 	args = parser.parse_args()
 

@@ -4,6 +4,7 @@ import math
 import boto.ec2
 import boto.sqs
 import boto.dynamodb
+import argparse
 
 class MonitorScheduler(object):
 	def __init__(self):
@@ -15,9 +16,7 @@ class MonitorScheduler(object):
 		dynamodbConn = boto.dynamodb.connect_to_region('us-west-2')
 		message_table_schema = dynamodbConn.create_schema(
 			hash_key_name = 'task_id',
-			hash_key_proto_value = str,
-			range_key_name = 'task_content',
-			range_key_proto_value = str
+			hash_key_proto_value = str
 		)
 		try:
 			myTable = dynamodbConn.create_table(
@@ -69,9 +68,22 @@ class MonitorScheduler(object):
 			print instances, aim_instances
 			if instances < aim_instances:
 				self.createEC2(aim_instances - instances)
+		return
 
+	def staticProvisioning(self, nWorkers):
+		ec2Conn = boto.ec2.connect_to_region('us-west-2')
+		self.createEC2(nWorkers)
+		return
 
 if __name__ == '__main__':
+	
+	# monitor --static/--dynamic
+	parser = argparse.ArgumentParser()
+	group = parser.add_mutually_exclusive_group()
+	group.add_argument('-sp', '--static', type=int, help='static provisioning')
+	group.add_argument('-dp', '--dynamic', help='dynamic provisioning', action='store_true')
+
+	args = parser.parse_args()
 
 	# Always have an eye on SQS and implement dynamic provisioning
 	monitorScheduler = MonitorScheduler()
@@ -79,7 +91,10 @@ if __name__ == '__main__':
 	monitorScheduler.createSQS()
 	monitorScheduler.createDynamoDB()
 	
-	monitorScheduler.dynamicProvisioning()
+	if args.dynamic:
+		monitorScheduler.dynamicProvisioning()
+	else:
+		monitorScheduler.staticProvisioning(args.static)
 	#monitorScheduler.createEC2(2)
 
 

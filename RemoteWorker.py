@@ -27,39 +27,49 @@ class RemoteWorker(object):
 			rs = taskQueue.get_messages()
 			if not flag:
 				startTime = datetime.datetime.now()
+			# No task get from taskQueue
 			if not len(rs):
 				flag = 1
 				endTime = datetime.datetime.now()
 				idleTime = (endTime - startTime).seconds
 				if idleTime > 20:
 					reservations = ec2Conn.get_all_reservations()
+					print reservations
 					instances = reservations[0].instances
 					localIP = socket.gethostbyname(socket.gethostname())
 					for instance in instances:
 						if instance.private_ip_address == localIP:
 							ec2Conn.terminate_instances(instance_ids=[instance.id])
 					break
+			# Get task from taskQueue
 			else:
 				task = rs[0].get_body()
 				taskId = str(task).split(':')[0]
 				taskContent = str(task).split(':')[1]
-				if myTable.get_item(hash_key=taskId):
+				if myTable.has_item(hash_key=taskId):
 					pass
 				else:
 					# Store into DynamoDB
-					item = table.new_item(hash_key=taskId, range_key=taskContent)
+					print 'Storing task ({}) into DynamoDB...' .format(task)
+					item_data = {'taskContent': taskContent}
+					item = myTable.new_item(hash_key=taskId, attrs = item_data)
 					item.put()
+					print myTable.has_item(hash_key=taskId)
+					print
 					# Execute task
-					milliSleepTime = taskContent.split(' ')[1]
+					print 'Executing task ({})...\n' .format(task)
+					milliSleepTime = taskContent.strip().split(' ')[1]
 					sleepTime = float(milliSleepTime) / 1000.0
 					time.sleep(sleepTime)
 					# Delete task from SQS
+					print 'Deleting task ({}) from taskQueue...\n' .format(task)
 					taskQueue.delete_message(rs[0])
 					# Sent result to SQS
 					result = task + 'is done.'
 					msg = Message()
 					msg.set_body(result)
 					resultQueue.write(msg)
+					print 'Sending result ({}) to resultQueue...\n' .format(result)
 		return
 
 
