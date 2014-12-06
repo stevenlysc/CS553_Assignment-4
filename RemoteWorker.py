@@ -24,7 +24,7 @@ class RemoteWorker(object):
 		
 		flag = 0
 		while 1:
-			rs = taskQueue.get_message()
+			rs = taskQueue.get_messages()
 			if not flag:
 				startTime = datetime.datetime.now()
 			if not len(rs):
