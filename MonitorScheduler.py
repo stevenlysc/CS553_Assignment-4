@@ -44,7 +44,7 @@ class MonitorScheduler(object):
 		ec2Conn = boto.ec2.connect_to_region('us-west-2')
 		for i in range(count):
 			ec2Conn.run_instances(
-				'ami-df2076ef',
+				'ami-b32c7a83',
 				key_name = 'PA4',
 				instance_type = 't2.micro',
 				security_groups = ['swift_security_group1']
