@@ -13,12 +13,6 @@ class MonitorScheduler(object):
 	def createDynamoDB(self):
 		print 'Creating a table with DynamoDB...'
 		dynamodbConn = boto.dynamodb.connect_to_region('us-west-2')
-
-		myTable = dynamodbConn.get_table('MyTable')
-		if myTable:
-			print 'Table already exists.\n'
-			return
-		
 		message_table_schema = dynamodbConn.create_schema(
 			hash_key_name = 'task_id',
 			hash_key_proto_value = str,
