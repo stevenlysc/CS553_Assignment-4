@@ -43,7 +43,7 @@ class MonitorScheduler(object):
 		ec2Conn = boto.ec2.connect_to_region('us-west-2')
 		for i in range(count):
 			ec2Conn.run_instances(
-				'ami-61550351',
+				'ami-ff5305cf',
 				key_name = 'PA4',
 				instance_type = 't2.micro',
 				security_groups = ['swift_security_group1']
@@ -63,7 +63,7 @@ class MonitorScheduler(object):
 			reservations = ec2Conn.get_all_reservations()
 			for res in reservations:
 				for inst in res.instances:
-					if inst.image_id == 'ami-61550351' and inst.state_code == 16:
+					if inst.image_id == 'ami-ff5305cf' and inst.state_code == 16:
 						instances += 1
 			queueLen = self.getQueueLength()
 			if not queueLen:
