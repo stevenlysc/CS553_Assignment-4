@@ -19,3 +19,7 @@ class LocalWorker(Thread):
 			result = task + ' is done'
 			self.results.append(result)
 		return
+
+
+if __name__ == '__main__':
+	pass
