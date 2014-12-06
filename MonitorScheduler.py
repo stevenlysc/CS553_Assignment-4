@@ -59,7 +59,12 @@ class MonitorScheduler(object):
 	def dynamicProvisioning(self):
 		ec2Conn = boto.ec2.connect_to_region('us-west-2')
 		while 1:
-			instances = len(ec2Conn.get_all_reservations()) - 2
+			instances = 0
+			reservations = ec2Conn.get_all_reservations()
+			for res in reservations:
+				for inst in res.instances:
+					if inst.image_id == 'ami-61550351' and inst.state_code == 16:
+						instances += 1
 			queueLen = self.getQueueLength()
 			if not queueLen:
 				aim_instances = 0
