@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import math
 import boto.ec2
 import boto.sqs
 import boto.dynamodb
@@ -8,7 +9,7 @@ class MonitorScheduler(object):
 	def __init__(self):
 		return
 	
-	# Initialization SQS and DynamoDB
+	# Initialization SQS and DynamoDB and create EC2 instances
 	def createDynamoDB(self):
 		print 'Creating a table with DynamoDB...'
 		dynamodbConn = boto.dynamodb.connect_to_region('us-west-2')
@@ -36,7 +37,7 @@ class MonitorScheduler(object):
 	def createSQS(self):
 		print 'Creating queue with SQS...'
 		sqsConn = boto.sqs.connect_to_region('us-west-2')
-		taskQueue = sqsConn.create_queue('taskQueue')
+		taskQueue = sqsConn.create_queue('taskQueue', 5)
 		resultQueue = sqsConn.create_queue('resultQueue')
 		print 'SQS created successful.\n'
 		return
@@ -51,8 +52,23 @@ class MonitorScheduler(object):
 				instance_type = 't2.micro',
 				security_groups = ['default']
 			)
-		print 'Instance created successful.\n'
+		print 'Instances created successful.\n'
 		return
+
+	def getQueueLength(self):
+		sqsConn = boto.sqs.connect_to_region('us-west-2')
+		taskQueue = sqsConn.get_queue('taskQueue')
+		return taskQueue.count()
+
+	def dynamicProvisioning(self):
+		ec2Conn = boto.ec2.connect_to_region('us-west-2')
+		while 1:
+			instances = len(ec2Conn.get_all_reservations())
+			queueLen = self.getQueueLength()
+			aim_instances = int(math.log(queueLen, 2)) + 1
+			print instances, aim_instances
+			if instances < aim_instances:
+				self.createEC2(aim_instances - instances)
 
 
 if __name__ == '__main__':
@@ -62,4 +78,16 @@ if __name__ == '__main__':
 	# Create SQS and DynamoDB
 	monitorScheduler.createSQS()
 	monitorScheduler.createDynamoDB()
-	monitorScheduler.createEC2(2)
+	
+	monitorScheduler.dynamicProvisioning()
+	#monitorScheduler.createEC2(2)
+
+
+
+
+
+
+
+
+
+
