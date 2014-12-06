@@ -99,24 +99,6 @@ class Scheduler(object):
 					self.results.append(result.get_body())
 		return
 
-	def createDynamoDB(self):
-		print 'Creating a table with DynamoDB...'
-		dynamodbConn = boto.dynamodb.connect_to_region('us-west-2')
-		message_table_schema = dynamodbConn.create_schema(
-			hash_key_name = 'task_id',
-			hash_key_proto_value = str,
-			range_key_name = 'task_content',
-			range_key_proto_value = str
-		)
-		myTable = dynamodbConn.create_table(
-			name = 'MyTable',
-			schema = message_table_schema,
-			read_units = 10,
-			write_units = 10
-		)
-		print 'Table created successful!'
-		return
-
 
 if __name__ == '__main__':
 	
@@ -140,6 +122,5 @@ if __name__ == '__main__':
 	
 	if args.remote:
 		scheduler.receiveTasks()
-		scheduler.createDynamoDB()
 		scheduler.sendTaskToSQS()
 		scheduler.getResultFromSQS()
