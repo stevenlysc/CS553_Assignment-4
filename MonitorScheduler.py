@@ -63,7 +63,7 @@ class MonitorScheduler(object):
 	def dynamicProvisioning(self):
 		ec2Conn = boto.ec2.connect_to_region('us-west-2')
 		while 1:
-			instances = len(ec2Conn.get_all_reservations())
+			instances = len(ec2Conn.get_all_reservations()) - 2
 			queueLen = self.getQueueLength()
 			aim_instances = int(math.log(queueLen, 2)) + 1
 			print instances, aim_instances
