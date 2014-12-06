@@ -31,19 +31,19 @@ class Scheduler(object):
 			if char == 'Q':
 				break
 			elif char == '\n':
-				print '{} received.' .format(task)
+				print '\t{} received.' .format(task)
 				self.tasks.append(task.strip())
 				task = str()
 			else:
 				task = task + str(char)
 
-		print '\nAll {} tasks have been received from client.\n' .format(len(self.tasks))
+		print 'All {} tasks have been received from client.\n' .format(len(self.tasks))
 
 		scheduler_socket.close()
 		return
 
 	def sendResults(self):
-		print 'Sending results back to client...\n'
+		print 'Sending results back to client...'
 
 		resultSent = list()
 
@@ -52,7 +52,7 @@ class Scheduler(object):
 
 		for result in self.results:
 			msg = 'Receiving result: {}' .format(result)
-			print 'Sending result: {}' .format(result)
+			print '\tSending result: {}' .format(result)
 			scheduler_socket.send('{}\n' .format(msg))
 
 		scheduler_socket.send('Q')
@@ -89,14 +89,16 @@ class Scheduler(object):
 		return
 
 	def getResultFromSQS(self):
-		print 'Retreiving results from SQS\n'
+		print 'Retreiving results from SQS'
 		sqsConn = boto.sqs.connect_to_region('us-west-2')
 		while len(self.results) < len(self.tasks):
 			resultQueue = sqsConn.get_queue('resultQueue')
 			results = resultQueue.get_messages()
 			for result in results:
-				if not result in self.results:
+				if not result.get_body() in self.results:
 					self.results.append(result.get_body())
+					print '\t{}' .format(result.get_body())
+		print 'All results have been retreived from SQS.\n'
 		return
 
 

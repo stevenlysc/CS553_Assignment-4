@@ -25,9 +25,9 @@ class MonitorScheduler(object):
 				read_units = 10,
 				write_units = 10
 			)
-			print 'Table created successful!\n'
+			print '\tTable created successful!\n'
 		except:
-			print 'MyTable already exists.'
+			print '\tMyTable already exists\n.'
 		return
 
 	def createSQS(self):
@@ -35,7 +35,7 @@ class MonitorScheduler(object):
 		sqsConn = boto.sqs.connect_to_region('us-west-2')
 		taskQueue = sqsConn.create_queue('taskQueue')
 		resultQueue = sqsConn.create_queue('resultQueue')
-		print 'SQS created successful.\n'
+		print '\tSQS queues created successful.\n'
 		return
 
 	def createEC2(self, count):
@@ -48,7 +48,7 @@ class MonitorScheduler(object):
 				instance_type = 't2.micro',
 				security_groups = ['swift_security_group1']
 			)
-		print 'Instances created successful.\n'
+		print '\t{} Instances are created successful.\n' .format(count)
 		return
 
 	def getQueueLength(self):
@@ -65,7 +65,6 @@ class MonitorScheduler(object):
 				aim_instances = 0
 			else:
 				aim_instances = int(math.log(queueLen, 2)) + 1
-			print instances, aim_instances
 			if instances < aim_instances:
 				self.createEC2(aim_instances - instances)
 		return

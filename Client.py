@@ -24,7 +24,7 @@ class Client(object):
         return tasks
     
     def send_Tasks(self):
-        print 'Sending tasks...\n'
+        print 'Sending tasks...'
         tasks = self.get_Tasks()
 
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -33,16 +33,16 @@ class Client(object):
         for taskId in range(len(tasks)):
             msg = 'Task {}: {}' .format(taskId, tasks[taskId])
             client_socket.send('{}\n' .format(msg))
-            print '{} is sent to scheduler successfully' .format(msg)
+            print '\t{} is sent to scheduler successfully' .format(msg)
         
         client_socket.send('Q')
-        print '\nAll tasks have been sent to scheduler successfully.\n'
+        print 'All tasks have been sent to scheduler successfully.\n'
 
         client_socket.close()
         return
     
     def receive_Result(self):
-        print 'Waiting for the results...\n'
+        print 'Waiting for the results...'
 
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.bind(('', self.port + 100))
@@ -55,7 +55,7 @@ class Client(object):
             if char == 'Q':
                 break
             elif char == '\n':
-                print result
+                print '\t' + result
                 result = str()
             else:
                 result = result + str(char)

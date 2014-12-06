@@ -57,19 +57,19 @@ class RemoteWorker(object):
 					item = myTable.new_item(hash_key=taskId, attrs = item_data)
 					item.put()
 					# Execute task
-					print 'Executing task ({})...\n' .format(task)
+					print 'Executing task ({})...' .format(task)
 					milliSleepTime = taskContent.strip().split(' ')[1]
 					sleepTime = float(milliSleepTime) / 1000.0
 					time.sleep(sleepTime)
 					# Delete task from SQS
-					print 'Deleting task ({}) from taskQueue...\n' .format(task)
+					print 'Deleting task ({}) from taskQueue...' .format(task)
 					taskQueue.delete_message(rs[0])
 					# Sent result to SQS
-					result = task + 'is done.'
+					result = task + ' is done.'
 					msg = Message()
 					msg.set_body(result)
 					resultQueue.write(msg)
-					print 'Sending result ({}) to resultQueue...\n' .format(result)
+					print 'Sending result ({}) to resultQueue...\n\n' .format(result)
 		return
 
 
