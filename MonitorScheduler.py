@@ -8,7 +8,7 @@ import argparse
 
 class MonitorScheduler(object):
 	def __init__(self):
-		self.ami = 'ami-c75006f7'
+		self.ami = 'ami-73510743'
 		return
 	
 	# Initialization SQS and DynamoDB and create EC2 instances
