@@ -27,7 +27,7 @@ class MonitorScheduler(object):
 			)
 			print '\tTable created successful!\n'
 		except:
-			print '\tMyTable already exists\n.'
+			print '\tMyTable already exists.\n'
 		return
 
 	def createSQS(self):
@@ -64,13 +64,14 @@ class MonitorScheduler(object):
 			for res in reservations:
 				for inst in res.instances:
 					if inst.image_id == 'ami-ff5305cf':
-						if inst.state_code or inst.state_code == 16:
+						if inst.state_code == 0 or inst.state_code == 16:
 							instances += 1
 			queueLen = self.getQueueLength()
 			if not queueLen:
 				aim_instances = 0
 			else:
 				aim_instances = int(math.log(queueLen, 2)) + 1
+			print instances, aim_instances
 			if instances < aim_instances:
 				self.createEC2(aim_instances - instances)
 		return
