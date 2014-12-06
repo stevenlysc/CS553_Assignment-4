@@ -47,8 +47,7 @@ class RemoteWorker(object):
 					pass
 				else:
 					# Store into DynamoDB
-					item_data = {'taskContent': taskContent}
-					item = table.new_item(hash_key=taskId, attrs=item_data)
+					item = table.new_item(hash_key=taskId, range_key=taskContent)
 					item.put()
 					# Execute task
 					milliSleepTime = taskContent.split(' ')[1]
