@@ -33,7 +33,7 @@ class RemoteWorker(object):
 				flag = 1
 				endTime = datetime.datetime.now()
 				idleTime = (endTime - startTime).seconds
-				if idleTime > 20:
+				if idleTime > 600:
 					reservations = ec2Conn.get_all_reservations()
 					for reservation in reservations:
 						for instance in reservation.instances:
