@@ -50,7 +50,7 @@ class MonitorScheduler(object):
 				'ami-df2076ef',
 				key_name = 'PA4',
 				instance_type = 't2.micro',
-				security_groups = ['default']
+				security_groups = ['swift_security_group1']
 			)
 		print 'Instances created successful.\n'
 		return
