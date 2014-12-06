@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import boto.sqs
-from boto.sqs.message import Message
+from LocalWorker import LocalWorker
 import socket
 import argparse
-from LocalWorker import LocalWorker
+import boto.sqs
+from boto.sqs.message import Message
+import boto.dynamodb
 
 class Scheduler(object):
 	def __init__(self, port):
@@ -75,13 +76,6 @@ class Scheduler(object):
 		return
 	
 	# Remote Worker
-	def createSQS(self):
-		sqsConn = boto.sqs.connect_to_region('us-west-2')
-		taskQueue = sqsConn.create_queue('taskQueue')
-		resultQueue = sqsConn.create_queue('resultQueue')
-		print 'SQS Create Successfull.\n'
-		return
-
 	def sendTaskToSQS(self):
 		print 'Sending tasks to SQS...'
 		sqsConn = boto.sqs.connect_to_region('us-west-2')
@@ -97,12 +91,31 @@ class Scheduler(object):
 	def getResultFromSQS(self):
 		print 'Retreiving results from SQS\n'
 		sqsConn = boto.sqs.connect_to_region('us-west-2')
-		resultQueue = sqsConn.get_queue('resultQueue')
-		results = resultQueue.get_messages()
-		for result in results:
-			self.results.append(result.get_body())
+		while len(self.results) < len(self.tasks):
+			resultQueue = sqsConn.get_queue('resultQueue')
+			results = resultQueue.get_messages()
+			for result in results:
+				if not result in self.results:
+					self.results.append(result.get_body())
 		return
 
+	def createDynamoDB(self):
+		print 'Creating a table with DynamoDB...'
+		dynamodbConn = boto.dynamodb.connect_to_region('us-west-2')
+		message_table_schema = dynamodbConn.create_schema(
+			hash_key_name = 'task_id',
+			hash_key_proto_value = str,
+			range_key_name = 'task_content',
+			range_key_proto_value = str
+		)
+		myTable = dynamodbConn.create_table(
+			name = 'MyTable',
+			schema = message_table_schema,
+			read_units = 10,
+			write_units = 10
+		)
+		print 'Table created successful!'
+		return
 
 
 if __name__ == '__main__':
@@ -127,6 +140,6 @@ if __name__ == '__main__':
 	
 	if args.remote:
 		scheduler.receiveTasks()
-		scheduler.createSQS()
+		scheduler.createDynamoDB()
 		scheduler.sendTaskToSQS()
 		scheduler.getResultFromSQS()
