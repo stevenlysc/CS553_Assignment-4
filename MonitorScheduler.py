@@ -63,8 +63,9 @@ class MonitorScheduler(object):
 			reservations = ec2Conn.get_all_reservations()
 			for res in reservations:
 				for inst in res.instances:
-					if inst.image_id == 'ami-ff5305cf' and inst.state_code == 16:
-						instances += 1
+					if inst.image_id == 'ami-ff5305cf':
+						if inst.state_code or inst.state_code == 16:
+							instances += 1
 			queueLen = self.getQueueLength()
 			if not queueLen:
 				aim_instances = 0
