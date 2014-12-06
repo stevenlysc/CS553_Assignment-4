@@ -37,7 +37,7 @@ class MonitorScheduler(object):
 	def createSQS(self):
 		print 'Creating queue with SQS...'
 		sqsConn = boto.sqs.connect_to_region('us-west-2')
-		taskQueue = sqsConn.create_queue('taskQueue', 5)
+		taskQueue = sqsConn.create_queue('taskQueue')
 		resultQueue = sqsConn.create_queue('resultQueue')
 		print 'SQS created successful.\n'
 		return
@@ -47,8 +47,8 @@ class MonitorScheduler(object):
 		ec2Conn = boto.ec2.connect_to_region('us-west-2')
 		for i in range(count):
 			ec2Conn.run_instances(
-				'ami-af26709f',
-				key_name = 'Li',
+				'ami-df2076ef',
+				key_name = 'PA4',
 				instance_type = 't2.micro',
 				security_groups = ['default']
 			)
