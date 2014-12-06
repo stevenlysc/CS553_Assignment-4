@@ -8,6 +8,7 @@ import argparse
 
 class MonitorScheduler(object):
 	def __init__(self):
+		self.ami = 'ami-0f50063f'
 		return
 	
 	# Initialization SQS and DynamoDB and create EC2 instances
@@ -43,7 +44,7 @@ class MonitorScheduler(object):
 		ec2Conn = boto.ec2.connect_to_region('us-west-2')
 		for i in range(count):
 			ec2Conn.run_instances(
-				'ami-ff5305cf',
+				self.ami,
 				key_name = 'PA4',
 				instance_type = 't2.micro',
 				security_groups = ['swift_security_group1']
@@ -63,7 +64,7 @@ class MonitorScheduler(object):
 			reservations = ec2Conn.get_all_reservations()
 			for res in reservations:
 				for inst in res.instances:
-					if inst.image_id == 'ami-ff5305cf':
+					if inst.image_id == self.ami:
 						if inst.state_code == 0 or inst.state_code == 16:
 							instances += 1
 			queueLen = self.getQueueLength()
