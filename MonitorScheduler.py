@@ -46,7 +46,7 @@ class MonitorScheduler(object):
 			ec2Conn.run_instances(
 				self.ami,
 				key_name = 'PA4',
-				instance_type = 't2.micro',
+				instance_type = 't2.small',
 				security_groups = ['swift_security_group1']
 			)
 		print '\t{} Instances are created successful.\n' .format(count)
