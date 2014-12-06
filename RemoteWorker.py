@@ -35,12 +35,11 @@ class RemoteWorker(object):
 				idleTime = (endTime - startTime).seconds
 				if idleTime > 20:
 					reservations = ec2Conn.get_all_reservations()
-					print reservations
-					instances = reservations[0].instances
-					localIP = socket.gethostbyname(socket.gethostname())
-					for instance in instances:
-						if instance.private_ip_address == localIP:
-							ec2Conn.terminate_instances(instance_ids=[instance.id])
+					for reservation in reservations:
+						for instance in reservation.instances:
+							localIP = socket.gethostbyname(socket.gethostname())
+							if instance.private_ip_address == localIP:
+								ec2Conn.terminate_instances(instance_ids=[instance.id])
 					break
 			# Get task from taskQueue
 			else:
