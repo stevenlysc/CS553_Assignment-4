@@ -7,7 +7,7 @@ import boto.dynamodb
 import time
 import datetime
 import socket
-
+import time
 class RemoteWorker(object):
 	def __init__(self):
 		return
@@ -25,10 +25,11 @@ class RemoteWorker(object):
 		flag = 0
 		while 1:
 			rs = taskQueue.get_messages()
+			print len(rs)
 			if not flag:
 				startTime = datetime.datetime.now()
 			# No task get from taskQueue
-			if not len(rs):
+			if len(rs) == 0:
 				flag = 1
 				endTime = datetime.datetime.now()
 				idleTime = (endTime - startTime).seconds
@@ -44,18 +45,17 @@ class RemoteWorker(object):
 			# Get task from taskQueue
 			else:
 				task = rs[0].get_body()
+				print task
 				taskId = str(task).split(':')[0]
 				taskContent = str(task).split(':')[1]
 				if myTable.has_item(hash_key=taskId):
-					pass
+					taskQueue.delete_message(rs[0])
 				else:
 					# Store into DynamoDB
 					print 'Storing task ({}) into DynamoDB...' .format(task)
 					item_data = {'taskContent': taskContent}
 					item = myTable.new_item(hash_key=taskId, attrs = item_data)
 					item.put()
-					print myTable.has_item(hash_key=taskId)
-					print
 					# Execute task
 					print 'Executing task ({})...\n' .format(task)
 					milliSleepTime = taskContent.strip().split(' ')[1]
