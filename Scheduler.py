@@ -124,3 +124,4 @@ if __name__ == '__main__':
 		scheduler.receiveTasks()
 		scheduler.sendTaskToSQS()
 		scheduler.getResultFromSQS()
+		scheduler.sendResults()
