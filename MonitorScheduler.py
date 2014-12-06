@@ -19,13 +19,16 @@ class MonitorScheduler(object):
 			range_key_name = 'task_content',
 			range_key_proto_value = str
 		)
-		myTable = dynamodbConn.create_table(
-			name = 'MyTable',
-			schema = message_table_schema,
-			read_units = 10,
-			write_units = 10
-		)
-		print 'Table created successful!\n'
+		try:
+			myTable = dynamodbConn.create_table(
+				name = 'MyTable',
+				schema = message_table_schema,
+				read_units = 10,
+				write_units = 10
+			)
+			print 'Table created successful!\n'
+		except:
+			print 'MyTable already exists.'
 		return
 
 	def createSQS(self):
@@ -59,7 +62,10 @@ class MonitorScheduler(object):
 		while 1:
 			instances = len(ec2Conn.get_all_reservations()) - 2
 			queueLen = self.getQueueLength()
-			aim_instances = int(math.log(queueLen, 2)) + 1
+			if not queueLen:
+				aim_instances = 0
+			else:
+				aim_instances = int(math.log(queueLen, 2)) + 1
 			print instances, aim_instances
 			if instances < aim_instances:
 				self.createEC2(aim_instances - instances)
