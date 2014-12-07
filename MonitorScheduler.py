@@ -65,6 +65,7 @@ class MonitorScheduler(object):
 
 	#According to the current length of the queue, launch instances dynamically
 	def dynamicProvisioning(self):
+		print 'Dynamic Provisioning...'
 		ec2Conn = boto.ec2.connect_to_region('us-west-2')
 		while 1:
 			instances = 0
@@ -92,6 +93,7 @@ class MonitorScheduler(object):
 
 	#Method of static provision, create given number of workers
 	def staticProvisioning(self, nWorkers):
+		print 'Static Provisioning...'
 		ec2Conn = boto.ec2.connect_to_region('us-west-2')
 		self.createEC2(nWorkers)
 		return
