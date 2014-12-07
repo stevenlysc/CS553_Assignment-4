@@ -23,8 +23,8 @@ class MonitorScheduler(object):
 			myTable = dynamodbConn.create_table(
 				name = 'MyTable',
 				schema = message_table_schema,
-				read_units = 10,
-				write_units = 10
+				read_units = 100,
+				write_units = 100
 			)
 			print '\tTable created successful!\n'
 		except:
