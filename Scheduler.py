@@ -98,13 +98,13 @@ class Scheduler(object):
 	def getResultFromSQS(self):
 		print 'Retreiving results from SQS'
 		sqsConn = boto.sqs.connect_to_region('us-west-2')
+		resultQueue = sqsConn.get_queue('resultQueue')
 		while len(self.results) < len(self.tasks):
-			resultQueue = sqsConn.get_queue('resultQueue')
-			results = resultQueue.get_messages()
-			for result in results:
-				if not result.get_body() in self.results:
-					self.results.append(result.get_body())
-					print '\t{}' .format(result.get_body())
+			rs = resultQueue.get_messages(10)
+			for result in rs:
+				self.results.append(result.get_body())
+				resultQueue.delete_message(result)
+				print '\t{}' .format(result.get_body())
 		print 'All results have been retreived from SQS.\n'
 		return
 
