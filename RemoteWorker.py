@@ -148,7 +148,7 @@ class RemoteWorker(object):
 					urls = task.split(' ')
 					# Download image files
 					for index in range(len(urls)):
-						call('wget {} -O /home/ubuntu/Animoto/pic/pic{}.jpg' .format(url.strip(), str(index).zfill(3)), shell=True)
+						call('wget {} -O /home/ubuntu/Animoto/pic/pic{}.jpg' .format(urls[index].strip(), str(index).zfill(3)), shell=True)
 					# create animotp
 					call('ffmpeg -i "/home/ubuntu/Animoto/pic/pic%d.jpg" -c:v libx264 -preset ultrafast -qp 0 -filter:v "setpts=25.5*PTS" /home/ubuntu/Animoto/pic/out{}.mkv' .format(str(index).zfill(3)))
 		return
