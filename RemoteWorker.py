@@ -76,7 +76,8 @@ class RemoteWorker(object):
 					print 'Sending result ({}) to resultQueue...\n\n' .format(result)
 		return
 
-	def startAnimoto(self):
+	def startUpload(self):
+		print 'Uploading video to S3...'
 		s3Conn = S3Connection()
 		sqsConn = boto.s3.connect_to_region('us-west-2')
 		resultQueue = sqsConn.get_queue('resultQueue')
@@ -115,6 +116,20 @@ class RemoteWorker(object):
 			# url is valid for 5 minutes
 			url = file_key.generate_url(300)
 			msg = Message()
+			msg.set_body(url)
+			resultQueue.write(msg)
+			print '\tSending result ({}) to resultQueue.\n' .format(url)
+		return
+
+	def generateVideo(self):
+		sqsConn = boto.sqs.connect_to_region('us-west-2')
+		dynamodbConn = boto.dynamodb.connect_to_region('us-west-2')
+		
+		taskQueue = sqsConn.get_queue('taskQueue')
+		myTable = dynamodbConn.get_table('MyTable')
+
+		while 1:
+
 
 
 
