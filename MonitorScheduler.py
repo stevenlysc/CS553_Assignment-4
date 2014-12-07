@@ -7,8 +7,11 @@ import boto.dynamodb
 import argparse
 
 class MonitorScheduler(object):
-	def __init__(self):
-		self.ami = 'ami-71461041'
+	def __init__(self, animoto):
+		if not animoto:
+			self.ami = 'ami-71461041'
+		else:
+			self.ami = 'ami-fb7325cb'
 		return
 	
 	# Initialization SQS and DynamoDB and create EC2 instances
@@ -106,10 +109,12 @@ if __name__ == '__main__':
 	group.add_argument('-sp', '--static', type=int, help='static provisioning')
 	group.add_argument('-dp', '--dynamic', help='dynamic provisioning', action='store_true')
 
+	parser.add_argument('-a', '--animoto', help='Animoto', action='store-true')
+
 	args = parser.parse_args()
 
 	# Always have an eye on SQS and implement dynamic provisioning
-	monitorScheduler = MonitorScheduler()
+	monitorScheduler = MonitorScheduler(args.animoto)
 	# Create SQS and DynamoDB
 	monitorScheduler.createSQS()
 	monitorScheduler.createDynamoDB()
