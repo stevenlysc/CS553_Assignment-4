@@ -9,9 +9,11 @@ import argparse
 class MonitorScheduler(object):
 	def __init__(self, animoto):
 		if not animoto:
-			self.ami = 'ami-cb7026fb'
+			# Sleep
+			self.ami = 'ami-9b7127ab'
 		else:
-			self.ami = 'ami-897026b9'
+			# Animoto
+			self.ami = 'ami-8d7127bd'
 		return
 	
 	# Initialization SQS and DynamoDB and create EC2 instances
