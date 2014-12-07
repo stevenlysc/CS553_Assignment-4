@@ -7,7 +7,10 @@ import boto.sqs
 from boto.sqs.message import Message
 import boto.dynamodb
 
+#Class of front-end scheduler
 class Scheduler(object):
+
+	#Initializing...
 	def __init__(self, port):
 		self.tasks = list()
 		self.results = list()
@@ -15,6 +18,7 @@ class Scheduler(object):
 		self.clientIP = str()
 		return
 
+	#Using socket, receive jobs from client
 	def receiveTasks(self):
 		print 'Waiting for the tasks from client...\n'
 		
@@ -24,7 +28,7 @@ class Scheduler(object):
 
 		clientSock, addr = scheduler_socket.accept()
 		self.clientIP = addr[0]
-
+		
 		task = str()
 		while 1:
 			char = clientSock.recv(1)

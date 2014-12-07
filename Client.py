@@ -4,12 +4,15 @@ import socket
 import time
 
 class Client(object):
+
+    # Initializing...
     def __init__(self, ip, port, workload_file):
         self.ip = ip
         self.port = int(port)
         self.workload_file = workload_file
         return
     
+    #Get tasks from job file
     def get_Tasks(self):
         tasks = list()
         try:
@@ -23,6 +26,7 @@ class Client(object):
             print e
         return tasks
     
+    #Using socket, send all the tasks to the scheduler
     def send_Tasks(self):
         print 'Sending tasks...'
         tasks = self.get_Tasks()
@@ -41,6 +45,7 @@ class Client(object):
         client_socket.close()
         return
     
+    #Using socket, listen the socket and receive the results from the scheduler. 
     def receive_Result(self):
         print 'Waiting for the results...'
 
@@ -72,7 +77,9 @@ class Client(object):
         return
 
 if __name__ == '__main__':    
-    # client -s <IP_ADDRESS:PORT> -w <WORKLOAD_FILE>
+
+    #Parse argument
+    #Format: client -s <IP_ADDRESS:PORT> -w <WORKLOAD_FILE>
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', metavar='IP_ADDRESS:PROT', type=str, required=True, 
                         help='the location of the front-end scheduler.')
@@ -84,12 +91,14 @@ if __name__ == '__main__':
     #    print 'usage: client -s <IP_ADDRESS:PORT> -w <WORKLOAD_FILE>'
     #    exit(-1)
     
+    #obtain the ip address, port and job file location from argument
     ip = args.s.split(':')[0]
     port = args.s.split(':')[1]
     workload_file = args.w
     
     client = Client(ip, port, workload_file)
     
+    #Set timer, start doing the job
     start = time.time()
     client.send_Tasks()
     client.receive_Result()
