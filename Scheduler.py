@@ -28,7 +28,7 @@ class Scheduler(object):
 
 		clientSock, addr = scheduler_socket.accept()
 		self.clientIP = addr[0]
-		
+
 		task = str()
 		while 1:
 			char = clientSock.recv(1)
@@ -46,6 +46,7 @@ class Scheduler(object):
 		scheduler_socket.close()
 		return
 
+	#Method of sending the result to client
 	def sendResults(self):
 		print 'Sending results back to client...'
 
@@ -63,6 +64,7 @@ class Scheduler(object):
 		print 'All results have been sent to client successfully.\n'
 		return
 	
+	#Method of creating workers using multi thread
 	def createLocalWorker(self, nWorkers):
 		workers = list()
 		
@@ -92,6 +94,7 @@ class Scheduler(object):
 		print 'All tasks have been sent to SQS successfully.\n'
 		return
 
+	#Getting result from sqs
 	def getResultFromSQS(self):
 		print 'Retreiving results from SQS'
 		sqsConn = boto.sqs.connect_to_region('us-west-2')
