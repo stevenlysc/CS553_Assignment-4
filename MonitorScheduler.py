@@ -14,12 +14,15 @@ class MonitorScheduler(object):
 	# Initialization SQS and DynamoDB and create EC2 instances
 	def createDynamoDB(self):
 		print 'Creating a table with DynamoDB...'
+		#Set region
 		dynamodbConn = boto.dynamodb.connect_to_region('us-west-2')
+		#Create schema
 		message_table_schema = dynamodbConn.create_schema(
 			hash_key_name = 'task_id',
 			hash_key_proto_value = str
 		)
 		try:
+			#Create table using the schema
 			myTable = dynamodbConn.create_table(
 				name = 'MyTable',
 				schema = message_table_schema,
@@ -31,6 +34,7 @@ class MonitorScheduler(object):
 			print '\tMyTable already exists.\n'
 		return
 
+	#Method of creating SQS
 	def createSQS(self):
 		print 'Creating queue with SQS...'
 		sqsConn = boto.sqs.connect_to_region('us-west-2')
@@ -38,7 +42,8 @@ class MonitorScheduler(object):
 		resultQueue = sqsConn.create_queue('resultQueue')
 		print '\tSQS queues created successful.\n'
 		return
-
+    
+    #Method of creating EC2 instance
 	def createEC2(self, count):
 		print 'Creating instance...'
 		ec2Conn = boto.ec2.connect_to_region('us-west-2')
@@ -52,31 +57,40 @@ class MonitorScheduler(object):
 		print '\t{} Instances are created successful.\n' .format(count)
 		return
 
+	#Method of geting length of the queue
 	def getQueueLength(self):
 		sqsConn = boto.sqs.connect_to_region('us-west-2')
 		taskQueue = sqsConn.get_queue('taskQueue')
 		return taskQueue.count()
 
+	#According to the current length of the queue, launch instances dynamically
 	def dynamicProvisioning(self):
 		ec2Conn = boto.ec2.connect_to_region('us-west-2')
 		while 1:
 			instances = 0
 			reservations = ec2Conn.get_all_reservations()
+
+			#Obtain current running or pending instances
 			for res in reservations:
 				for inst in res.instances:
 					if inst.image_id == self.ami:
 						if inst.state_code == 0 or inst.state_code == 16:
 							instances += 1
 			queueLen = self.getQueueLength()
+
+			#Using log function, calculate the aim number of instances
 			if not queueLen:
 				aim_instances = 0
 			else:
 				aim_instances = int(math.log(queueLen, 2)) + 1
+
+			#Print the current running (pending) instances and aim number of instances
 			print instances, aim_instances
 			if instances < aim_instances:
 				self.createEC2(aim_instances - instances)
 		return
 
+	#Method of static provision, create given number of workers
 	def staticProvisioning(self, nWorkers):
 		ec2Conn = boto.ec2.connect_to_region('us-west-2')
 		self.createEC2(nWorkers)
