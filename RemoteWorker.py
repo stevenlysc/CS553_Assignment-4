@@ -7,12 +7,13 @@ import boto.dynamodb
 import time
 import datetime
 import socket
-import time
+import argparser
+
 class RemoteWorker(object):
 	def __init__(self):
 		return
 
-	def start(self):
+	def startSleep(self):
 		sqsConn = boto.sqs.connect_to_region('us-west-2')
 		dynamodbConn = boto.dynamodb.connect_to_region('us-west-2')
 		ec2Conn = boto.ec2.connect_to_region('us-west-2')
@@ -71,8 +72,19 @@ class RemoteWorker(object):
 					print 'Sending result ({}) to resultQueue...\n\n' .format(result)
 		return
 
+	def startAnimoto(self):
+		
 
 if __name__ == '__main__':
+
+	# remoteWorker [--animoto]
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-a', '--animoto', help='Animoto', action='store_true')
+
+	args = parser.parse_args()
 	
 	remoteWorker = RemoteWorker()
-	remoteWorker.start()
+	if args.animoto:
+		remoteWorker.startAnimoto()
+	else:
+		remoteWorker.startSleep()
