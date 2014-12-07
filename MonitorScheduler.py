@@ -109,7 +109,7 @@ if __name__ == '__main__':
 	group.add_argument('-sp', '--static', type=int, help='static provisioning')
 	group.add_argument('-dp', '--dynamic', help='dynamic provisioning', action='store_true')
 
-	parser.add_argument('-a', '--animoto', help='Animoto', action='store-true')
+	parser.add_argument('-a', '--animoto', help='Animoto', action='store_true')
 
 	args = parser.parse_args()
 
