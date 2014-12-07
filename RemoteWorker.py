@@ -7,11 +7,12 @@ import boto.dynamodb
 import time
 import datetime
 import socket
-import argparser
+import argparse
 import math, os
 import boto.s3
 from boto.s3.connection import S3Connection, Location
 from filechunkio import FileChunkIO
+from subprocess import call
 
 class RemoteWorker(object):
 	def __init__(self):
