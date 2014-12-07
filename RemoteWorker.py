@@ -76,7 +76,7 @@ class RemoteWorker(object):
 					print 'Sending result ({}) to resultQueue...\n\n' .format(result)
 		return
 
-	def startUpload(self):
+	def UploadVideo(self):
 		print 'Uploading video to S3...'
 		s3Conn = S3Connection()
 		sqsConn = boto.s3.connect_to_region('us-west-2')
@@ -129,8 +129,32 @@ class RemoteWorker(object):
 		myTable = dynamodbConn.get_table('MyTable')
 
 		while 1:
+			rs = taskQueue.get_messages()
+			if len(rs) == 0:
+				pass
+			else:
+				task = rs[0].get_body()
+				taskId = str(task).split(':')[0]
+				taskContent = str(task).split(':')[1]
+				if myTable.has_item(hash_key=taskId):
+					taskQueue.delete_message(rs[0])
+				else:
+					# Store into DynamoDB
+					item_data = {'taskContent': taskContent}
+					item = myTable.new_item(hash_key=taskId, attrs=item_data)
+					item.put()
+					# Execute task
+					urls = task.split(' ')
+					# Download image files
+					for index in range(len(urls)):
+						call('wget {} -O /home/ubuntu/Animoto/pic/pic{}.jpg' .format(url.strip(), str(index).zfill(3)), shell=True)
+					# create animotp
+					call('ffmpeg -i "pic%d.jpg" -c:v libx264 -preset ultrafast -qp 0 -filter:v "setpts=25.5*PTS" out{}.mkv' .format(str(index).zfill(3)))
+		return
 
-
+	def startAnimoto(self):
+		self.generateVideo()
+		self.uploadVideo()
 
 
 
