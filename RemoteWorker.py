@@ -92,14 +92,13 @@ class RemoteWorker(object):
 
 		# Get file info
 		source_paths = list()
-		source_path_prefix = '/home/ubuntu/Animoto/pic'
+		source_path_prefix = '/home/ubuntu/Animoto/pic/'
 		for item in os.listdir(source_path_prefix):
 			if item.split('.')[1] == 'mkv' or item.split('.')[1] == 'MKV':
-				source_paths.append(os.path.realpath(item))
-				source_sizes.append(os.stat(os.path.realpath(item)).st_size)
+				source_paths.append(source_path_prefix + os.path.basename(item))
 
 		for source_path in source_paths:
-			source_size = os.stat(os.path.realpath(source_path).st_size)
+			source_size = os.stat(source_path).st_size
 			# Create a multipart upload request, file name as the key_name
 			mp = bucket.initiate_multipart_upload(os.path.basename(source_path))
 			# Use a chunk size of 50 MiB
@@ -141,16 +140,7 @@ class RemoteWorker(object):
 					taskQueue.delete_message(rs[0])
 				else:
 					# Store into DynamoDB
-					item_data = {'taskContent': taskContent}
-					item = myTable.new_item(hash_key=taskId, attrs=item_data)
-					item.put()
-					# Execute task
-					urls = task.split(' ')
-					# Download image files
-					for index in range(len(urls)):
-						call('wget {} -O /home/ubuntu/Animoto/pic/pic{}.jpg' .format(urls[index].strip(), str(index).zfill(3)), shell=True)
-					# create animotp
-					call('ffmpeg -i "/home/ubuntu/Animoto/pic/pic%d.jpg" -c:v libx264 -preset ultrafast -qp 0 -filter:v "setpts=25.5*PTS" /home/ubuntu/Animoto/pic/out{}.mkv' .format(str(index).zfill(3)))
+					call('sh /Users/WayneHu/Desktop/pic/list.sh', shell=True)
 		return
 
 	def startAnimoto(self):
