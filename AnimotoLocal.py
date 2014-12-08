@@ -1,13 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import boto.ec2
-import boto.sqs
-from boto.sqs.message import Message
-import boto.dynamodb
 import time
 import datetime
-import socket
-import argparse
 import math, os
 import boto.s3
 from boto.s3.connection import S3Connection, Location
@@ -66,7 +60,7 @@ class Animoto(object):
 		return
 
 	def startAnimoto(self):
-		#self.generateVideo()
+		self.generateVideo()
 		self.uploadVideo()
 
 
