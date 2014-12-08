@@ -22,7 +22,6 @@ class Animoto(object):
 		print 'Uploading video to S3...'
 		s3Conn = S3Connection()
 		sqsConn = boto.s3.connect_to_region('us-west-2')
-		resultQueue = sqsConn.get_queue('resultQueue')
 		# Try to create a new bucket if it does not exist
 		try:
 			s3Conn.create_bucket('xingtanhu', location=Location.USWest2)
