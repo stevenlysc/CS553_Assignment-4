@@ -36,10 +36,7 @@ class Animoto(object):
 		print 'prefix: {}' .format(source_path_prefix)
 		for item in os.listdir(source_path_prefix):
 			if item.split('.')[1] == 'mkv' or item.split('.')[1] == 'MKV':
-				source_paths.append(os.path.realpath(item))
-				print '\tfile: {}' .format(item)
-				print '\tpath: {}' .format(os.path.realpath(item))
-		print
+				source_paths.append(source_path_prefix + os.path.basename(item))
 		for source_path in source_paths:
 			print 'Path: {}' .format(source_path)
 			source_size = os.stat(source_path).st_size
