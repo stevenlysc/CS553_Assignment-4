@@ -141,11 +141,11 @@ class RemoteWorker(object):
 				else:
 					# Store into DynamoDB
 					call('sh /home/ubuntu/Animoto/pic/list.sh', shell=True)
+					self.uploadVideo()
 		return
 
 	def startAnimoto(self):
 		self.generateVideo()
-		self.uploadVideo()
 
 
 
