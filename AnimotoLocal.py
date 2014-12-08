@@ -33,15 +33,17 @@ class Animoto(object):
 		# Get file info
 		source_paths = list()
 		source_path_prefix = '/Users/WayneHu/Desktop/pic/'
-		print 'prefix: {}\n' .format(source_path_prefix)
+		print 'prefix: {}' .format(source_path_prefix)
 		for item in os.listdir(source_path_prefix):
 			if item.split('.')[1] == 'mkv' or item.split('.')[1] == 'MKV':
 				source_paths.append(os.path.realpath(item))
-
+				print '\tfile: {}' .format(item)
+				print '\tpath: {}' .format(os.path.realpath(item))
+		print
 		for source_path in source_paths:
-			print '\tPath: {}' .format(source_path)
+			print 'Path: {}' .format(source_path)
 			source_size = os.stat(source_path).st_size
-			print '\tSize: {}' .format(source_size)
+			print 'Size: {}' .format(source_size)
 			# Create a multipart upload request, file name as the key_name
 			mp = bucket.initiate_multipart_upload(os.path.basename(source_path))
 			# Use a chunk size of 50 MiB
