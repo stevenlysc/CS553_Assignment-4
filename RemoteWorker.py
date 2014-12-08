@@ -140,7 +140,7 @@ class RemoteWorker(object):
 					taskQueue.delete_message(rs[0])
 				else:
 					# Store into DynamoDB
-					call('sh /Users/WayneHu/Desktop/pic/list.sh', shell=True)
+					call('sh /home/ubuntu/Animoto/pic/list.sh', shell=True)
 		return
 
 	def startAnimoto(self):
