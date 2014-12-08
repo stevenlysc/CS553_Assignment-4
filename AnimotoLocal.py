@@ -38,7 +38,7 @@ class Animoto(object):
 				source_paths.append(os.path.realpath(item))
 
 		for source_path in source_paths:
-			source_size = os.stat(os.path.realpath(source_path).st_size)
+			source_size = os.stat(source_path).st_size
 			# Create a multipart upload request, file name as the key_name
 			mp = bucket.initiate_multipart_upload(os.path.basename(source_path))
 			# Use a chunk size of 50 MiB
@@ -64,7 +64,7 @@ class Animoto(object):
 		return
 
 	def startAnimoto(self):
-		self.generateVideo()
+		#self.generateVideo()
 		self.uploadVideo()
 
 
