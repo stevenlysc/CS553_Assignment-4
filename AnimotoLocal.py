@@ -33,6 +33,8 @@ class Animoto(object):
 		# Get file info
 		source_paths = list()
 		source_path_prefix = '/Users/WayneHu/Desktop/pic/'
+		print 'prefix: {}' .format(source_path_prefix)
+		print 'files: {}' .format(os.listdir(source_path_prefix))
 		for item in os.listdir(source_path_prefix):
 			if item.split('.')[1] == 'mkv' or item.split('.')[1] == 'MKV':
 				source_paths.append(os.path.realpath(item))
