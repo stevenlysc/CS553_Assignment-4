@@ -29,7 +29,7 @@ class Animoto(object):
 		source_path_prefix = '/Users/WayneHu/Desktop/pic/'
 		print 'prefix: {}' .format(source_path_prefix)
 		for item in os.listdir(source_path_prefix):
-			if item.split('.')[1] == 'mkv' or item.split('.')[1] == 'MKV':
+			if item.split('.')[1] == 'txt' or item.split('.')[1] == 'TXT':
 				source_paths.append(source_path_prefix + os.path.basename(item))
 		for source_path in source_paths:
 			print 'Path: {}' .format(source_path)
