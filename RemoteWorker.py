@@ -146,7 +146,7 @@ class RemoteWorker(object):
 					command_line = '''#! /bin/sh
 					cd /home/ubuntu/CS553_Assignment4/pic
 					wget -i pic.txt >> ~/Log{}.txt
-					x=1; for i in *jpg; do counter=$(printf %d $x); ln -s '$i' /home/ubuntu/CS553_Assignment4/pic/pic'$counter'.jpg; x=$(($x+1)); done
+					x=1; for i in *jpg; do counter=$(printf %d $x); ln -s '$i' /home/ubuntu/CS553_Assignment4/pic/pic'$counter'.jpg; x=$(($x+1)) done
 					ffmpeg -i 'pic%d.jpg' -c:v libx264 -preset ultrafast  -ap 0 -filter:v 'setpts=25.5*PTS' out{}.mkv >> ~/Log{}.txt
 					''' .format(str(i).zfill(3), str(i).zfill(3), str(i).zfill(3))
 					#call(command_line, shell=True)
