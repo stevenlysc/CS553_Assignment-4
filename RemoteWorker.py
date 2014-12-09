@@ -111,8 +111,11 @@ class RemoteWorker(object):
 				f_offset = chunk_size * i
 				print f_offset
 				f_bytes = min(chunk_size, source_size - f_offset)
+				print f_bytes
 				with FileChunkIO(source_path, 'r', offset = f_offset, bytes = f_bytes) as fp:
+					print 'waiting...'
 					mp.upload_part_from_file(fp, part_num=i+1)
+					print 'partially finished...'
 			# Complete uploading
 			mp.complete_upload()
 			file_key = bucket.get_key(os.path.basename(source_path))
