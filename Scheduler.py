@@ -60,7 +60,7 @@ class Scheduler(object):
 			print '\tSending result: {}' .format(result)
 			scheduler_socket.send('{}\n' .format(msg))
 
-		scheduler_socket.send('Q')
+		scheduler_socket.send('`')
 		print 'All results have been sent to client successfully.\n'
 		
 		scheduler_socket.close()
@@ -115,7 +115,7 @@ class Scheduler(object):
 				print '\tSending result: {}' .format(result.get_body())
 				scheduler_socket.send('{}\n' .format(msg))
 		print 'All results have been retreived from SQS.\n'
-		scheduler_socket.send('Q')
+		scheduler_socket.send('`')
 		scheduler_socket.close()
 		return
 

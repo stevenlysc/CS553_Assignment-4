@@ -57,7 +57,7 @@ class Client(object):
         result = str()
         while 1:  
             char = conn.recv(1)
-            if char == 'Q':
+            if char == '`':
                 break
             elif char == '\n':
                 print '\t' + result
