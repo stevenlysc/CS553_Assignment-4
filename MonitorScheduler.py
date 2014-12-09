@@ -13,7 +13,7 @@ class MonitorScheduler(object):
 			self.ami = 'ami-9b7127ab'
 		else:
 			# Animoto
-			self.ami = 'ami-8db2e4bd'
+			self.ami = 'ami-05b3e535'
 		return
 	
 	# Initialization SQS and DynamoDB and create EC2 instances
