@@ -16,6 +16,12 @@ from subprocess import call
 
 class RemoteWorker(object):
 	def __init__(self):
+		command_line = '''#! /bin/sh
+		cd /home/ubuntu/CS553_Assignment4/pic
+		wget -i pic.txt
+		x=1; for i in *jpg; do counter=$9printf %d $x); ln -s '$i' /home/ubuntu/CS553_Assignment4/pic/pic'$counter'.jpg; x=$(($x+1)); done
+		ffmpeg -i 'pic%d.jpg' -c:v libx264 -preset ultrafast  -ap 0 -filter:v 'setpts=25.5*PTS' out.mkv
+		'''
 		return
 
 	def startSleep(self):
@@ -142,7 +148,13 @@ class RemoteWorker(object):
 				else:
 					# Store into DynamoDB
 					taskQueue.delete_message(rs[0])
-					call('sh /home/ubuntu/CS553_Assignment4/pic/list.sh >> ~/Log{}.txt' .format(str(i)), shell=True)
+					        command_line = '''#! /bin/sh
+							cd /home/ubuntu/CS553_Assignment4/pic
+							wget -i pic.txt >> ~/Log{}.txt
+							x=1; for i in *jpg; do counter=$9printf %d $x); ln -s '$i' /home/ubuntu/CS553_Assignment4/pic/pic'$counter'.jpg; x=$(($x+1)); done
+							ffmpeg -i 'pic%d.jpg' -c:v libx264 -preset ultrafast  -ap 0 -filter:v 'setpts=25.5*PTS' out{}.mkv >> ~/Log{}.txt
+							''' .format(str(i).zfill(3), str(i).zfill(3), str(i).zfill(3))
+					call(command_line, shell=True)
 					i += 1
 					self.uploadVideo()
 		return
