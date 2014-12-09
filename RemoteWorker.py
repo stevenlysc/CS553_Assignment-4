@@ -128,6 +128,7 @@ class RemoteWorker(object):
 		taskQueue = sqsConn.get_queue('taskQueue')
 		myTable = dynamodbConn.get_table('MyTable')
 
+		i = 0
 		while 1:
 			rs = taskQueue.get_messages()
 			if len(rs) == 0:
@@ -140,7 +141,8 @@ class RemoteWorker(object):
 					taskQueue.delete_message(rs[0])
 				else:
 					# Store into DynamoDB
-					call('sh /home/ubuntu/Animoto/pic/list.sh', shell=True)
+					call('sh /home/ubuntu/Animoto/pic/list.sh >> Log{}.txt' .format(str(i)), shell=True)
+					i += 1
 					self.uploadVideo()
 		return
 
