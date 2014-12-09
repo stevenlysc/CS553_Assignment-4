@@ -104,7 +104,7 @@ class RemoteWorker(object):
 			# Create a multipart upload request, file name as the key_name
 			mp = bucket.initiate_multipart_upload(os.path.basename(source_path))
 			# Use a chunk size of 50 MiB
-			chunk_size = 52428800
+			chunk_size = 5242880
 			chunk_count = int(math.ceil(source_size / chunk_size))
 			# Send the file parts
 			for i in range(chunk_count + 1):
