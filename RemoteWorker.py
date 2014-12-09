@@ -85,11 +85,11 @@ class RemoteWorker(object):
 		resultQueue = sqsConn.get_queue('resultQueue')
 		# Try to create a new bucket if it does not exist
 		try:
-			s3Conn.create_bucket('xingtanhu', location=Location.USWest2)
+			s3Conn.create_bucket('boyangli', location=Location.USWest2)
 		except:
 			print 'bucket already exists.'
 		finally:
-			bucket = s3Conn.get_bucket('xingtanhu')
+			bucket = s3Conn.get_bucket('boyangli')
 
 		# Get file info
 		source_paths = list()
