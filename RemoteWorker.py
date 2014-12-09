@@ -112,6 +112,7 @@ class RemoteWorker(object):
 				print f_offset
 				f_bytes = min(chunk_size, source_size - f_offset)
 				with FileChunkIO(source_path, 'r', offset = f_offset, bytes = f_bytes) as fp:
+					mp.upload_part_from_file(fp, part_num=i+1)
 			# Complete uploading
 			mp.complete_upload()
 			file_key = bucket.get_key(os.path.basename(source_path))
