@@ -77,7 +77,7 @@ class RemoteWorker(object):
 					print 'Sending result ({}) to resultQueue...\n\n' .format(result)
 		return
 
-	def UploadVideo(self):
+	def uploadVideo(self):
 		print 'Uploading video to S3...'
 		s3Conn = S3Connection()
 		sqsConn = boto.s3.connect_to_region('us-west-2')
