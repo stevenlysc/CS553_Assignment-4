@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import commands
 import boto.ec2
 import boto.sqs
 from boto.sqs.message import Message
@@ -148,7 +149,8 @@ class RemoteWorker(object):
 					x=1; for i in *jpg; do counter=$9printf %d $x); ln -s '$i' /home/ubuntu/CS553_Assignment4/pic/pic'$counter'.jpg; x=$(($x+1)); done
 					ffmpeg -i 'pic%d.jpg' -c:v libx264 -preset ultrafast  -ap 0 -filter:v 'setpts=25.5*PTS' out{}.mkv >> ~/Log{}.txt
 					''' .format(str(i).zfill(3), str(i).zfill(3), str(i).zfill(3))
-					call(command_line, shell=True)
+					#call(command_line, shell=True)
+					commands.getstatusoutput(command_line)
 					i += 1
 					self.uploadVideo()
 		return
