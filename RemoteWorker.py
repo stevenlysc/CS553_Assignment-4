@@ -92,7 +92,7 @@ class RemoteWorker(object):
 
 		# Get file info
 		source_paths = list()
-		source_path_prefix = '/home/ubuntu/Animoto/pic/'
+		source_path_prefix = '/home/ubuntu/CS553_Assignment4/pic/'
 		for item in os.listdir(source_path_prefix):
 			if item.split('.')[1] == 'mkv' or item.split('.')[1] == 'MKV':
 				source_paths.append(source_path_prefix + os.path.basename(item))
@@ -142,7 +142,7 @@ class RemoteWorker(object):
 				else:
 					# Store into DynamoDB
 					taskQueue.delete_message(rs[0])
-					call('sh /home/ubuntu/Animoto/pic/list.sh >> ~/Log{}.txt' .format(str(i)), shell=True)
+					call('sh /home/ubuntu/CS553_Assignment4/pic/list.sh >> ~/Log{}.txt' .format(str(i)), shell=True)
 					i += 1
 					self.uploadVideo()
 		return
