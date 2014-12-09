@@ -151,7 +151,6 @@ class RemoteWorker(object):
 					#''' .format(str(i).zfill(3), str(i).zfill(3), str(i).zfill(3))
 					call('sh /home/ubuntu/CS553_Assignment4/pic/list.sh {} >> ~/Log{}.txt' .format(str(i).zfill(3), str(i).zfill(3)), shell=True)
 					i += 1
-					time.sleep(300)
 					self.uploadVideo()
 		return
 
