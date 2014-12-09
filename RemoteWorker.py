@@ -99,6 +99,7 @@ class RemoteWorker(object):
 				source_paths.append(source_path_prefix + os.path.basename(item))
 
 		for source_path in source_paths:
+			print source_path
 			source_size = os.stat(source_path).st_size
 			# Create a multipart upload request, file name as the key_name
 			mp = bucket.initiate_multipart_upload(os.path.basename(source_path))
@@ -108,10 +109,10 @@ class RemoteWorker(object):
 			# Send the file parts
 			for i in range(chunk_count + 1):
 				f_offset = chunk_size * i
+				print f_offset
 				f_bytes = min(chunk_size, source_size - f_offset)
 				with FileChunkIO(source_path, 'r', offset = f_offset, bytes = f_bytes) as fp:
-					mp.upload_part_from_file(fp, part_num=i+1)
-			# Finish the upload
+			# Complete uploading
 			mp.complete_upload()
 			file_key = bucket.get_key(os.path.basename(source_path))
 			# url is valid for 5 minutes
