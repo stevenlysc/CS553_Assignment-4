@@ -144,6 +144,7 @@ class RemoteWorker(object):
 					call('sh /home/ubuntu/Animoto/pic/list.sh >> Log{}.txt' .format(str(i)), shell=True)
 					i += 1
 					self.uploadVideo()
+					taskQueue.delete_message(rs[0])
 		return
 
 	def startAnimoto(self):
