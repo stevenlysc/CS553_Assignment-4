@@ -62,6 +62,8 @@ class Scheduler(object):
 
 		scheduler_socket.send('Q')
 		print 'All results have been sent to client successfully.\n'
+		
+		scheduler_socket.close()
 		return
 	
 	#Method of creating workers using multi thread
@@ -99,13 +101,21 @@ class Scheduler(object):
 		print 'Retreiving results from SQS'
 		sqsConn = boto.sqs.connect_to_region('us-west-2')
 		resultQueue = sqsConn.get_queue('resultQueue')
+
+		scheduler_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		scheduler_socket.connect((self.clientIP, self.port + 100))
+
 		while len(self.results) < len(self.tasks):
 			rs = resultQueue.get_messages(10)
 			for result in rs:
 				self.results.append(result.get_body())
 				resultQueue.delete_message(result)
 				print '\t{}' .format(result.get_body())
+				msg = 'Receiving result: {}' .format(result.get_body())
+				print '\tSending result: {}' .format(result.get_body())
+				scheduler_socket.send('{}\n' .format(msg))
 		print 'All results have been retreived from SQS.\n'
+		scheduler_socket.close()
 		return
 
 
@@ -133,4 +143,3 @@ if __name__ == '__main__':
 		scheduler.receiveTasks()
 		scheduler.sendTaskToSQS()
 		scheduler.getResultFromSQS()
-		scheduler.sendResults()
